@@ -1,0 +1,10 @@
+include "aws",
+        "aws:api-handler",
+        "aws:periodic-checker",
+        "aws:common",
+        "aws:worker",
+        "deployment",
+        "scripts",
+        "scripts:api-azure",
+        "scripts:publish",
+        "scripts:test-transcription"

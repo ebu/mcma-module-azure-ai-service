@@ -1,0 +1,30 @@
+{
+    "name": "azure-ai-service-cloudwatch-trigger",
+    "version": "0.0.0",
+    "description": "AWS Lambda based service leveraging azure AI services to extract metadata",
+    "private": true,
+    "license": "UNLICENSED",
+    "dependencies": {
+        "@mcma/api": "0.14.7",
+        "@mcma/aws-client": "0.14.7",
+        "@mcma/aws-dynamodb": "0.14.7",
+        "@mcma/aws-lambda-worker-invoker": "0.14.7",
+        "@mcma/aws-logger": "0.14.7",
+        "@mcma/aws-s3": "0.14.7",
+        "@mcma/client": "0.14.7",
+        "@mcma/core": "0.14.7",
+        "@mcma/data": "0.14.7",
+        "@mcma/worker": "0.14.7",
+        "@mcma/worker-invoker": "0.14.7",
+        "aws-sdk": "^2.1000.0",
+        "aws-xray-sdk": "^3.3.3",
+        "axios": "^0.23.0",
+        "unzipper": "^0.10.11",
+        "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.84",
+        "@types/node": "^14.17.24",
+        "@types/uuid": "^8.3.1"
+    }
+}
