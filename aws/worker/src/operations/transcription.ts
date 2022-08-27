@@ -1,7 +1,7 @@
 import { default as axios } from "axios";
 
 import { ProcessJobAssignmentHelper, ProviderCollection, WorkerRequest } from "@mcma/worker";
-import { AIJob, JobStatus, Locator, ProblemDetail, Utils } from "@mcma/core";
+import { AIJob, JobStatus, Locator, Logger, ProblemDetail, Utils } from "@mcma/core";
 
 import { enableEventRule } from "@local/azure-common";
 
@@ -101,7 +101,7 @@ export async function processTranscriptionCompletion(providers: ProviderCollecti
         const inputFile = jobInput.inputFile as Locator;
         const jsonOutputFile = await writeOutputFile(generateFilePrefix(inputFile.url) + ".json", transcriptionContent, ctx.s3);
 
-        const webvtt = generateWebVtt(transcriptionContent);
+        const webvtt = generateWebVtt(transcriptionContent, logger);
         logger.info(webvtt);
 
         const webVttOutputFile = await writeOutputFile(generateFilePrefix(inputFile.url) + ".vtt", webvtt, ctx.s3);
@@ -135,7 +135,7 @@ export async function processTranscriptionCompletion(providers: ProviderCollecti
     }
 }
 
-function generateWebVtt(output: any) {
+function generateWebVtt(output: any, logger: Logger) {
     const MAX_CHARS_PER_LINE = 42;
 
     let webvtt = "WEBVTT";
@@ -168,17 +168,20 @@ function generateWebVtt(output: any) {
                 sentence = testSentence;
             }
 
-            if (start < 0) {
-                start = wordStats.offsetInTicks / 10000000;
+            if (wordStats) {
+                if (start < 0) {
+                    start = wordStats.offsetInTicks / 10000000;
+                }
+                end = (wordStats.offsetInTicks + wordStats.durationInTicks) / 10000000 - 0.001;
             }
-            end = (wordStats.offsetInTicks + wordStats.durationInTicks) / 10000000 - 0.001;
         }
     }
 
-    webvtt += `\n\n${index++}\n`;
-    webvtt += `${formatTimestamp(start)} --> ${formatTimestamp(end)}\n`;
-    webvtt += `${sentence}`;
-
+    if (sentence && start >= 0 && end >= 0) {
+        webvtt += `\n\n${index++}\n`;
+        webvtt += `${formatTimestamp(start)} --> ${formatTimestamp(end)}\n`;
+        webvtt += `${sentence}`;
+    }
     return webvtt;
 }
 

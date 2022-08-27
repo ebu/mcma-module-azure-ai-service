@@ -25,8 +25,8 @@ async function main() {
     const resp = await client.get("/transcriptions");
     log(resp.data);
 
-    // const audioUrl = "https://ebu-mcma-google-ai-upload-eu-west-1.s3.eu-west-1.amazonaws.com/test.wav?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEMz%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDGV1LWNlbnRyYWwtMSJHMEUCIBAjOWZD5zaHecHP3sjxMnK9kThf5Pl3aUvjtH%2BQ%2BfQxAiEAjJMjX7if6uhASxFrY0bw%2FfGPxfOBtqJoAktooUkn6T0q%2BwIIRRACGgwwODM1MzQ0NTA0NjUiDGfJLYTXY6XNY7mWzyrYAvqf2n0tZ7QylfKs1em%2BLf7sooIenxdAb5V5HyTr89xCvS4hxz627zBPCVPtrX80ulPADSrr13Gv%2Bs4r0pPuXYe4GG4UqCpG81JIJCZOwxbUFAaIHgdIzmT9jGgy6yf5oZ4gkSjQV7ML91w5buNM2AUX%2BJRXKkF1uJ0LY5MMYrzlMRcBCE3N7kUmjNzdE4osWWQAtaX4JoHLbr%2B0G9ydtb59Sc3tp%2F73Etul0N9fEXya08dqzi0lr45zNUbIkuWWyKj1me8nxC2sT3txsAs1fo%2FDuRYCZDGvgsTx5b0FvfXyLNrf10qzBBxZy%2FPYj1vfOABwH2ngW3fjDqtp8JtBstLcG5KM3mJLkZ6OfEGsZHlolrAq5sVT0e47gqILGmXQ0CgfpGJpt91fezOUg2CnB0AU7PdlaXrBGvxYQ4%2BNwKdazFHF8X68aVowbEpMmc4NeTBoWfMdSNPGMKyhg5gGOrMClyCxf7f%2FMnbJ8s6bg%2FOeAWsEWR14bk9dW7jfW3mSlRfRaNJJPB57OkVgQnqDT237noq2KmQWg2MMVPOAu%2BK2%2FI6hyY9ifvZOSuwYoatgkTHAo0QB2O6ZmBoXII5xRpW3RN%2BI0yaZHm%2FQ3Wfgmh19e9fbRPw%2BRQwx4MpcQEHMI2lhJ3xVIRCvCHHrZzbRPCp7VIACwksp1FG1QeXSJh3n805ErXJI%2BlDvXuEkEaDro2RVA7fu8JTBoceFX0y5Vu8Vg6mV4OH0LynGO%2Fdl3Tda4oVKnl%2FXv97eNCP%2BECRPVclN38YqyyU0GyDQG1iR8Qjkp3m79dWLQM2vzBUoYmmeRPaws0sak8irr7qDRPSF3p4snlHtKFUiFuPo%2B7HadYZDscckw80%2BMrV0mflWzFfuVNYDOQ%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20220820T121834Z&X-Amz-SignedHeaders=host&X-Amz-Expires=43200&X-Amz-Credential=ASIARG4YKR4QTZXRIKOE%2F20220820%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Signature=9ea0f02e5efad830c475914f251e4fc43662eccd5bea12944c0df4d91aacba59";
-
+    // const audioUrl = "https://pt-rovers-mam-dev-ffmpeg-service-output-eu-west-1.s3.eu-west-1.amazonaws.com/ffmpeg-service/2022-08-27T15-48-44/2015_GF_ORF_00_18_09_conv.wav?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIARG4YKR4Q7O6B44CJ%2F20220827%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20220827T154844Z&X-Amz-Expires=43200&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEHgaCWV1LXdlc3QtMSJHMEUCIAuyYogxhAY4QS8JIUXVRlu6NbT3%2FmPrZBTiryhW1NbhAiEA2RA3hFTgB2SVIm1ohlzOIgNY5JCC6RpSNXmgHRzbOMwqrAMI8f%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARACGgwwODM1MzQ0NTA0NjUiDIV%2FFw0lzZYwCsX4VSqAA%2FOi7PG5R%2FuEs2y%2Fa%2Bx0y9EpvBNhTc52RR%2FeYPQINSNK8H3twnOK9PQntMglUJVlwY6CSxFNJYaIM0Kcfy%2BCaca%2FPbEtB7mCa4sI9J%2F9L4pNn7NpgHX5W2ULVO%2FIMDx5ufTQgp9fMoQQSuTAo0073Pkdzh0jEIVJYa1R440hLRxiVTd2IKsO%2FmAfq47benyKxsGaduzRCV4dh3u1A1DRhLHpabTcUKLmta09mN2e6AeijKaykxDmuz4JCZQxxSBbAg%2Fy9dnw8FKqeZ%2ByTPnYvHAiP9tgHQ44SHSKAnavKUPafwmCi%2BNt3aOINd5azCA683Y3Fzc620YJ3ToJrrcdVXP21X4UKFw6suipipFn%2BvVvvnn%2FU4Vl1Q03cvJdFilVFnck966EW7TDkqF3qO%2BZW6VVhCNVjd3X7LQStac6kewBkwnMoOLkZYbnpi5EkM2DPrhv8sX3UCPo%2BYR4KwFuKEaj1De7XbzC6JbTSje7iygtBHVdb%2FJrYeZm6prOaJl8RTDY%2BaiYBjqdAYAykEI1Y6%2Fa049GyCa8%2FGxhCYtbQQqcX7enTM3BaAZX9gixHFkdGtCWBfvN626OhDkrOS7t4r0hMEQbyo6E%2BtLZI0jMB26de0thMaipBZHzUrBX2fplkVM%2FTZ9tDp5IHjenPRaBvObnIkgMH6r74jUb5eaCR6xR9E2%2BBDK5rQ5C8%2F68h490790hJsx7Ohqnn%2FrdzI9tR%2BWzfIHix94%3D&X-Amz-Signature=aec27c22b50592864babe14e048c0dc5655849af80deabda2e9290ce8fd4a029&X-Amz-SignedHeaders=host";
+    //
     // const postResp = await client.post("/transcriptions", {
     //     contentUrls: [
     //         audioUrl
@@ -41,9 +41,10 @@ async function main() {
     //
     // log (postResp.data);
 
-    // const filesResp = await client.get("/transcriptions/fb9ae3df-9a4b-4d73-b4fb-ef587852564c/files");
+    // const filesResp = await client.get("https://francecentral.api.cognitive.microsoft.com/speechtotext/v3.0/transcriptions/14a97276-1fe8-4486-9256-9a3cfa58f1fd/files");
     // log(filesResp.data);
 
+    // await client.delete("https://francecentral.api.cognitive.microsoft.com/speechtotext/v3.0/transcriptions/14a97276-1fe8-4486-9256-9a3cfa58f1fd");
 }
 
 main().then(() => console.log("Done")).catch(e => console.error(e));
