@@ -4,7 +4,7 @@ import * as AWSXRay from "aws-xray-sdk-core";
 import { AuthProvider, ResourceManagerProvider } from "@mcma/client";
 import { ProcessJobAssignmentOperation, ProviderCollection, Worker, WorkerRequest, WorkerRequestProperties } from "@mcma/worker";
 import { DynamoDbTableProvider } from "@mcma/aws-dynamodb";
-import { AwsCloudWatchLoggerProvider } from "@mcma/aws-logger";
+import { AwsCloudWatchLoggerProvider, getLogGroupName } from "@mcma/aws-logger";
 import { awsV4Auth } from "@mcma/aws-client";
 import { AIJob } from "@mcma/core";
 import {
@@ -15,19 +15,19 @@ import { CloudWatchEvents, S3 } from "aws-sdk";
 
 import { AzureClient } from "@local/azure-common";
 
-const { LogGroupName, ConfigFileBucket, ConfigFileKey } = process.env;
+const { CONFIG_FILE_BUCKET, CONFIG_FILE_KEY } = process.env;
 
 const AWS = AWSXRay.captureAWS(require("aws-sdk"));
 
 const authProvider = new AuthProvider().add(awsV4Auth(AWS));
 const dbTableProvider = new DynamoDbTableProvider();
-const loggerProvider = new AwsCloudWatchLoggerProvider("azure-ai-service-worker", LogGroupName);
+const loggerProvider = new AwsCloudWatchLoggerProvider("azure-ai-service-worker", getLogGroupName());
 const resourceManagerProvider = new ResourceManagerProvider(authProvider);
 
 const s3 = new AWS.S3({ signatureVersion: "v4" });
 const cloudWatchEvents = new AWS.CloudWatchEvents();
 
-const azureClient = new AzureClient(ConfigFileBucket, ConfigFileKey, s3);
+const azureClient = new AzureClient(CONFIG_FILE_BUCKET, CONFIG_FILE_KEY, s3);
 
 const providerCollection = new ProviderCollection({
     authProvider,

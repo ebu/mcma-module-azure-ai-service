@@ -9,7 +9,7 @@ import { WorkerContext } from "../index";
 import { generateFilePrefix, getFileExtension, writeOutputFile } from "./utils";
 import { getTableName } from "@mcma/data";
 
-const { CloudWatchEventRule } = process.env;
+const { CLOUD_WATCH_EVENT_RULE } = process.env;
 
 export async function transcription(providers: ProviderCollection, jobAssignmentHelper: ProcessJobAssignmentHelper<AIJob>, ctx: WorkerContext) {
     const logger = jobAssignmentHelper.logger;
@@ -43,7 +43,7 @@ export async function transcription(providers: ProviderCollection, jobAssignment
 
     await ctx.azureClient.startTranscription([inputFile.url], jobAssignmentHelper.jobAssignment.id, logger);
 
-    await enableEventRule(CloudWatchEventRule, jobAssignmentHelper.dbTable, ctx.cloudWatchEvents, ctx.awsRequestId, logger);
+    await enableEventRule(CLOUD_WATCH_EVENT_RULE, jobAssignmentHelper.dbTable, ctx.cloudWatchEvents, ctx.awsRequestId, logger);
 }
 
 export async function processTranscriptionCompletion(providers: ProviderCollection, workerRequest: WorkerRequest, ctx: WorkerContext) {
@@ -91,7 +91,7 @@ export async function processTranscriptionCompletion(providers: ProviderCollecti
         }
 
         logger.info("Getting transcription files");
-        const transcriptionFiles = await ctx.azureClient.getTranscriptionFiles(workerRequest.input.transcription.self, logger);
+        const transcriptionFiles = await ctx.azureClient.getTranscriptionFiles(workerRequest.input.transcription.self, logger) as { values: any[] };
         logger.info(transcriptionFiles);
 
         const [transcriptionFile] = transcriptionFiles.values.filter(tf => tf.kind === "Transcription");
@@ -135,7 +135,7 @@ export async function processTranscriptionCompletion(providers: ProviderCollecti
     }
 }
 
-function generateWebVtt(output: any, logger: Logger) {
+function generateWebVtt(output: { recognizedPhrases: any[] }, logger: Logger) {
     const MAX_CHARS_PER_LINE = 42;
 
     let webvtt = "WEBVTT";

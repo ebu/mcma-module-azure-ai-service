@@ -2,7 +2,7 @@ import { Context, ScheduledEvent } from "aws-lambda";
 import * as AWSXRay from "aws-xray-sdk-core";
 
 import { getTableName } from "@mcma/data";
-import { AwsCloudWatchLoggerProvider } from "@mcma/aws-logger";
+import { AwsCloudWatchLoggerProvider, getLogGroupName } from "@mcma/aws-logger";
 import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
 import { DynamoDbTableProvider } from "@mcma/aws-dynamodb";
 import { getWorkerFunctionId } from "@mcma/worker-invoker";
@@ -10,17 +10,17 @@ import { JobAssignmentProperties } from "@mcma/core";
 
 import { AzureClient, disableEventRule, enableEventRule } from "@local/azure-common";
 
-const { CloudWatchEventRule, ConfigFileBucket, ConfigFileKey, LogGroupName, PublicUrl } = process.env;
+const { CLOUD_WATCH_EVENT_RULE, CONFIG_FILE_BUCKET, CONFIG_FILE_KEY, MCMA_PUBLIC_URL } = process.env;
 
 const AWS = AWSXRay.captureAWS(require("aws-sdk"));
 const s3 = new AWS.S3();
 const cloudWatchEvents = new AWS.CloudWatchEvents();
 
 const dbTableProvider = new DynamoDbTableProvider({}, new AWS.DynamoDB());
-const loggerProvider = new AwsCloudWatchLoggerProvider("azure-ai-service-periodic-checker", LogGroupName, new AWS.CloudWatchLogs());
+const loggerProvider = new AwsCloudWatchLoggerProvider("azure-ai-service-periodic-checker", getLogGroupName(), new AWS.CloudWatchLogs());
 const workerInvoker = new LambdaWorkerInvoker(new AWS.Lambda());
 
-const azureClient = new AzureClient(ConfigFileBucket, ConfigFileKey, s3);
+const azureClient = new AzureClient(CONFIG_FILE_BUCKET, CONFIG_FILE_KEY, s3);
 const PageSize = 100;
 
 export async function handler(event: ScheduledEvent, context: Context) {
@@ -42,16 +42,16 @@ export async function handler(event: ScheduledEvent, context: Context) {
                 let totalActive = 0;
                 let totalFinished = 0;
 
-                await disableEventRule(CloudWatchEventRule, table, cloudWatchEvents, context.awsRequestId, logger);
+                await disableEventRule(CLOUD_WATCH_EVENT_RULE, table, cloudWatchEvents, context.awsRequestId, logger);
 
                 try {
                     for (let skip = 0; ; skip += PageSize) {
                         const transcriptions = await azureClient.getTranscriptions(skip, PageSize, logger);
 
                         for (const transcription of transcriptions.values) {
-                            if (transcription.displayName.startsWith(PublicUrl)) {
+                            if (transcription.displayName.startsWith(MCMA_PUBLIC_URL)) {
                                 if (transcription.status === "Succeeded" || transcription.status === "Failed") {
-                                    const jobAssignmentDatabaseId = transcription.displayName.substring(PublicUrl.length);
+                                    const jobAssignmentDatabaseId = transcription.displayName.substring(MCMA_PUBLIC_URL.length);
                                     const jobAssignment = await table.get<JobAssignmentProperties>(jobAssignmentDatabaseId);
                                     if (!jobAssignment) {
                                         await azureClient.deleteTranscription(transcription.self, logger);
@@ -85,7 +85,7 @@ export async function handler(event: ScheduledEvent, context: Context) {
 
                 logger.info(`Processed ${totalFinished + totalActive} transcriptions of which ${totalFinished} are finished and ${totalActive} are still active`);
                 if (totalActive > 0) {
-                    await enableEventRule(CloudWatchEventRule, table, cloudWatchEvents, context.awsRequestId, logger);
+                    await enableEventRule(CLOUD_WATCH_EVENT_RULE, table, cloudWatchEvents, context.awsRequestId, logger);
                 }
             } finally {
                 await mutex.unlock();

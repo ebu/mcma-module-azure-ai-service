@@ -25,6 +25,8 @@ resource "aws_iam_role" "periodic_checker" {
     ]
   })
 
+  permissions_boundary = var.iam_permissions_boundary
+
   tags = var.tags
 }
 
@@ -143,21 +145,23 @@ resource "aws_lambda_function" "periodic_checker" {
   handler          = "index.handler"
   filename         = local.periodic_checker_zip_file
   source_code_hash = filebase64sha256(local.periodic_checker_zip_file)
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
   timeout          = "900"
   memory_size      = "2048"
 
-  layers = var.enhanced_monitoring_enabled ? ["arn:aws:lambda:${var.aws_region}:580247275435:layer:LambdaInsightsExtension:14"] : []
+  layers = var.enhanced_monitoring_enabled && contains(keys(local.lambda_insights_extensions), var.aws_region) ? [
+    local.lambda_insights_extensions[var.aws_region]
+  ] : []
 
   environment {
     variables = {
-      LogGroupName        = var.log_group.name
-      TableName           = aws_dynamodb_table.service_table.name
-      PublicUrl           = local.service_url
-      WorkerFunctionId    = aws_lambda_function.worker.function_name
-      ConfigFileBucket    = aws_s3_object.config_file.bucket
-      ConfigFileKey       = aws_s3_object.config_file.id
-      CloudWatchEventRule = aws_cloudwatch_event_rule.periodic_checker.name
+      MCMA_LOG_GROUP_NAME     = var.log_group.name
+      MCMA_TABLE_NAME         = aws_dynamodb_table.service_table.name
+      MCMA_PUBLIC_URL         = local.service_url
+      MCMA_WORKER_FUNCTION_ID = aws_lambda_function.worker.function_name
+      CONFIG_FILE_BUCKET      = aws_s3_object.config_file.bucket
+      CONFIG_FILE_KEY         = aws_s3_object.config_file.id
+      CLOUD_WATCH_EVENT_RULE  = aws_cloudwatch_event_rule.periodic_checker.name
     }
   }
 
