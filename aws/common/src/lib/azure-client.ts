@@ -1,4 +1,4 @@
-import { S3 } from "aws-sdk";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Logger, McmaException } from "@mcma/core";
 import { default as axios, AxiosInstance } from "axios";
 
@@ -13,7 +13,7 @@ export class AzureClient {
 
     private transcriptionClient: AxiosInstance;
 
-    constructor(private configFileS3Bucket: string, private configFileS3Key: string, private s3: S3) {
+    constructor(private configFileS3Bucket: string, private configFileS3Key: string, private s3Client: S3Client) {
         this.configFileETag = "";
         this.configFileRefreshTimestamp = 0;
     }
@@ -27,11 +27,11 @@ export class AzureClient {
             this.configFileRefreshTimestamp = Date.now() + 300000; // Check for new file not more often than once every 5 minutes
 
             logger.info(`Fetching config file from S3 bucket '${this.configFileS3Bucket}' with key '${this.configFileS3Key}`);
-            const data = await this.s3.getObject({
+            const data = await this.s3Client.send(new GetObjectCommand({
                 Bucket: this.configFileS3Bucket,
                 Key: this.configFileS3Key,
                 IfNoneMatch: this.configFileETag
-            }).promise();
+            }));
 
             if (this.configFileETag) {
                 logger.info("New config file detected");
@@ -40,7 +40,7 @@ export class AzureClient {
             this.configFileETag = data.ETag;
 
             logger.info("Loading config file");
-            const configFile: AzureConfigFile = JSON.parse(data.Body.toString());
+            const configFile: AzureConfigFile = JSON.parse(await data.Body.transformToString());
 
             if (configFile.transcriptionServiceSubscriptionKey && configFile.transcriptionServiceBaseUrl) {
                 this.transcriptionClient = axios.create({

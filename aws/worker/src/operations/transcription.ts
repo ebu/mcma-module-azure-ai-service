@@ -2,12 +2,12 @@ import { default as axios } from "axios";
 
 import { ProcessJobAssignmentHelper, ProviderCollection, WorkerRequest } from "@mcma/worker";
 import { AIJob, JobStatus, Locator, Logger, ProblemDetail, Utils } from "@mcma/core";
+import { getTableName } from "@mcma/data";
 
 import { enableEventRule } from "@local/azure-common";
 
 import { WorkerContext } from "../index";
 import { generateFilePrefix, getFileExtension, writeOutputFile } from "./utils";
-import { getTableName } from "@mcma/data";
 
 const { CLOUD_WATCH_EVENT_RULE } = process.env;
 
@@ -43,7 +43,7 @@ export async function transcription(providers: ProviderCollection, jobAssignment
 
     await ctx.azureClient.startTranscription([inputFile.url], jobAssignmentHelper.jobAssignment.id, logger);
 
-    await enableEventRule(CLOUD_WATCH_EVENT_RULE, jobAssignmentHelper.dbTable, ctx.cloudWatchEvents, ctx.awsRequestId, logger);
+    await enableEventRule(CLOUD_WATCH_EVENT_RULE, jobAssignmentHelper.dbTable, ctx.cloudWatchEventsClient, ctx.awsRequestId, logger);
 }
 
 export async function processTranscriptionCompletion(providers: ProviderCollection, workerRequest: WorkerRequest, ctx: WorkerContext) {
@@ -99,12 +99,12 @@ export async function processTranscriptionCompletion(providers: ProviderCollecti
         const transcriptionContent = transcriptionContentResponse.data;
 
         const inputFile = jobInput.inputFile as Locator;
-        const jsonOutputFile = await writeOutputFile(generateFilePrefix(inputFile.url) + ".json", transcriptionContent, ctx.s3);
+        const jsonOutputFile = await writeOutputFile(generateFilePrefix(inputFile.url) + ".json", transcriptionContent, ctx.s3Client);
 
         const webvtt = generateWebVtt(transcriptionContent, logger);
         logger.info(webvtt);
 
-        const webVttOutputFile = await writeOutputFile(generateFilePrefix(inputFile.url) + ".vtt", webvtt, ctx.s3);
+        const webVttOutputFile = await writeOutputFile(generateFilePrefix(inputFile.url) + ".vtt", webvtt, ctx.s3Client);
 
         logger.info("Updating job assignment with output");
         jobAssignmentHelper.jobOutput.outputFiles = [
