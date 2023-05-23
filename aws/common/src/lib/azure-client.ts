@@ -53,7 +53,7 @@ export class AzureClient {
                 this.transcriptionClient = undefined;
             }
         } catch (error) {
-            if (error.statusCode === 304) { // NotModified
+            if (error.$metadata?.httpStatusCode === 304) { // NotModified
                 logger.info("Config file not modified since last load");
                 return;
             }
